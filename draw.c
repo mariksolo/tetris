@@ -21,7 +21,7 @@ void render_scene(struct App app)
 
 void draw_block(struct App app, struct Position position, SDL_Color color)
 {
-	SDL_Rect rectangle = {position.x, position.y, BLOCK_SIZE, BLOCK_SIZE};
+	SDL_Rect rectangle = {position.x, position.y, BLOCK_SIZE - 1.0, BLOCK_SIZE - 1.0};
 	SDL_SetRenderDrawColor(app.renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderFillRect(app.renderer, &rectangle);
 }

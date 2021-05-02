@@ -1,3 +1,5 @@
+#ifndef STRUCTS
+#define STRUCTS
 #include "SDL2/SDL.h"
 
 struct App
@@ -12,9 +14,17 @@ struct Position
     int y;
 };
 
+struct Scene_Position
+{
+    int x;
+    int y;
+};
+
 struct Color
 {
     int r;
     int g;
     int b;
 };
+
+#endif
