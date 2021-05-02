@@ -34,31 +34,15 @@ void draw_scene(struct App app)
         draw_block(app, position, color);
     }
 
-    int config[4][4] = {{1, 0, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}};
-    int **configuration = malloc(sizeof(int*) * 4);
-    for (int i = 0; i < 4; i++) {
-        *(configuration + i) = malloc(sizeof(int) * 4);
-        for (int j = 0; j < 4; j++) {
-            *(*(configuration + i) + j) = config[i][j];
-        }
-    }
+    int config[4][4] = {{1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
 
     SDL_Color color2 = {255, 0, 0, 255};
     struct Scene_Position piece_scene_position = {5, 5};
-    struct Piece piece = {NULL, 't', 0, configuration, NULL, NULL};
+    struct Piece piece = {NULL, 't', 0, NULL, NULL, NULL};
+    memcpy(piece.configuration, config, sizeof (config));
     piece.color = &color2;
     piece.scene_position = &piece_scene_position;
 
 
     draw_piece(app, &piece);
-
-
-    for (int i = 0; i < 4; i++) {
-        // for (int j = 0; j < 4; j++) {
-        //     free(*(configuration + i) + j);
-        // }
-
-        free(*(configuration + i));
-    }
-    free(configuration);
 }

@@ -7,7 +7,7 @@ struct Piece {
     void *rotate;
     char type;
     int config_id;
-    int **configuration;
+    int configuration[4][4];
     struct SDL_Color *color;
     struct Scene_Position *scene_position;
 };
