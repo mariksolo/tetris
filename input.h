@@ -1,5 +1,5 @@
 #ifndef INPUT
 #define INPUT
-void read_input(void);
+void read_input(int *next_action);
 
 #endif

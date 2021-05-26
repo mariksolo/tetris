@@ -11,7 +11,7 @@ void initialize_scene(struct App app)
 	// struct Position position = {50, 50};
 	// SDL_Color color = {255, 0, 255, 255};
 	// draw_block(app, position, color);
-	draw_scene(app);
+	// draw_scene(app);
 }
 
 void render_scene(struct App app)
