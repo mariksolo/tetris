@@ -29,30 +29,34 @@ int main()
         }
     }
 
-    for (int col = 0; col < 10; col++)
-    {
-        dead_blocks[19][col] = color2;
-    }
+    // for (int col = 1; col < 10; col++)
+    // {
+    //     dead_blocks[19][col] = color2;
+    // }
 
-    for (int col = 0; col < 10; col++)
-    {
-        dead_blocks[18][col] = color2;
-    }
+    // for (int col = 1; col < 10; col++)
+    // {
+    //     dead_blocks[18][col] = color2;
+    // }
 
-    // dead_blocks[5][5] = color2;
-    struct Scene_Position piece_scene_position = {5, 5};
+    struct Scene_Position piece_scene_position = {3, 0};
 
     int config[4][4] = {{1, 1, 1, 1}, {1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-    struct Piece piece = {NULL, 't', 0, NULL, NULL, NULL};
+    struct Piece piece = {'t', 0, NULL, NULL, NULL};
     memcpy(piece.configuration, config, sizeof(config));
     piece.color = &color2;
     piece.scene_position = &piece_scene_position;
 
     int fall_time_counter = 0;
+    int action_timer = 0;
 
     while (1)
     {
-        read_input(next_action);
+        if (action_timer > 2)
+        {
+            read_input(next_action);
+        }
+
         if (fall_time_counter == 30)
         {
             *fall_needed = 1;
@@ -64,6 +68,19 @@ int main()
         }
         draw_scene(app, next_action, new_piece_needed, fall_needed, dead_blocks, &piece);
         render_scene(app);
+        if (*next_action != -1)
+        {
+            *next_action = -1;
+            action_timer = 0;
+        }
+        if (*new_piece_needed == 1) {
+            piece.type = 't';
+            piece.scene_position->x = 3;
+            piece.scene_position->y = 0;
+            *new_piece_needed = 0;
+
+        }
+        action_timer++;
 
         SDL_Delay(50);
         fall_time_counter++;

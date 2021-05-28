@@ -5,6 +5,8 @@
 #include "../gameplay/Piece.h"
 #include "../gameplay/draw_piece.h"
 #include "../gameplay/process_state.h"
+#include "../gameplay/check_movement.h"
+#include "../gameplay/draw_dead_blocks.h"
 
 void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fall_needed, SDL_Color dead_blocks[][10], struct Piece *falling_piece)
 {
@@ -13,7 +15,7 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
 
     SDL_Color color = {10, 10, 10, 255};
 
-    struct Scene_Position scene_position = {0, 19};
+    struct Scene_Position scene_position = {0, 20};
     struct Position position = {0, 0};
     for (int x = -1; x <= SCENE_WIDTH; x++)
     {
@@ -22,7 +24,7 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
         draw_block(app, position, color);
     }
 
-    for (int y = 0; y < SCENE_HEIGHT; y++)
+    for (int y = 0; y <= SCENE_HEIGHT; y++)
     {
         scene_position.y = y;
 
@@ -34,33 +36,77 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
         position = get_position(&scene_position);
         draw_block(app, position, color);
     }
-    
-    if (*fall_needed) {
+
+    if (*fall_needed)
+    {
         falling_piece->scene_position->y = falling_piece->scene_position->y + 1;
     }
 
-    struct Scene_Position proposed_scene_position = { falling_piece->scene_position->x, falling_piece->scene_position->y};
-    
-    if (*next_action == 97) {
+    struct Scene_Position proposed_scene_position = {falling_piece->scene_position->x, falling_piece->scene_position->y};
+    struct Scene_Position old_scene_position = {falling_piece->scene_position->x, falling_piece->scene_position->y};
+    // struct Piece proposed_falling_piece = { falling_piece->type, falling_piece->config_id, falling_piece->configuration, falling_piece->color, falling_piece->scene_position};
+    // struct Piece *proposed_falling_piece  = new (buf) struct Piece;
+    // memcpy(proposed_falling_piece, falling_piece, sizeof (falling_piece));
+
+    if (*next_action == 0)
+    {
         proposed_scene_position.x = proposed_scene_position.x - 1;
-    } else if (*next_action == 100) {
+    }
+    else if (*next_action == 1)
+    {
         proposed_scene_position.x = proposed_scene_position.x + 1;
-    } else if (*next_action == 115) {
+    }
+    else if (*next_action == 2)
+    {
         proposed_scene_position.y = proposed_scene_position.y + 1;
     }
+    // falling_piece->scene_position = &proposed_scene_position;
+    memcpy(falling_piece->scene_position, &proposed_scene_position, sizeof(&proposed_scene_position));
+
+    int points = process_state(dead_blocks);
+    draw_dead_blocks(app, dead_blocks);
+
+    if (falling_piece->type == 'e') {
+        return;
+    }
+    int move_result = check_movement(dead_blocks, falling_piece);
+
     // draw_piece(app, falling_piece);
+    printf("move_result: %d\n", move_result);
+    if (move_result == 1)
+    {
+        draw_piece(app, falling_piece);
+    }
+    else
+    {
+        // falling_piece->scene_position->y = falling_piece->scene_position->y - 1;
+        printf("!move_result\n");
+        // falling_piece->scene_position = &old_scene_position;
+        memcpy(falling_piece->scene_position, &old_scene_position, sizeof(&old_scene_position));
+        move_result = check_movement(dead_blocks, falling_piece);
+        if (move_result == 1)
+        {
+            draw_piece(app, falling_piece);
+        }
+        else
+        {
+            printf("!move_result2\n");
+            // Set falling_piece to dead_blocks
+            falling_piece->scene_position->y = falling_piece->scene_position->y - 1;
+            for (int row = falling_piece->scene_position->y; row < falling_piece->scene_position->y + 4; row++)
+            {
+                for (int col = falling_piece->scene_position->x; col < falling_piece->scene_position->x + 4; col++)
+                {   
+                    if (falling_piece->configuration[row - falling_piece->scene_position->y][col - falling_piece->scene_position->x])
+                        dead_blocks[row][col] = *falling_piece->color;
+                }
+                *new_piece_needed = 1;
+            }
+            draw_piece(app, falling_piece);
+            falling_piece->type = 'e';
+        }
+    }
 
-    int points = process_state(dead_blocks, falling_piece);
-    printf("points: %d\n", points);
-
-
-    // Looks at fall flag pointer passed in to decide downward movement.
-    // (Looks at input pointer passed into it. Gets new, proposed, falling (if necessary) piece.)
-        // Nevermind
-    // passes 2d array of dead blocks and into process_state, gets output of points and new 2d array.
-    // Passes new 2d array and proposed falling piece into process_piece, if -1 then repeats step with only fall.
-        // -1 = overlap to side -> switch to just fall, no side-to-side or rotation input
-        // 0 = overlap to bottom -> don't move, modify dead board to include this piece. Set output piece pointer asking for a new piece
-        // 1 = everything is fine -> draw as is
-
+    // check_movement returns -1 if any overlap, determine whether fall overlap or movement overlap by running it without action. If it still doesn't
+    // work after a second run through check_movement -> add falling_piece to dead_blocks
 }

@@ -4,7 +4,6 @@
 #include "SDL2/SDL.h"
 
 struct Piece {
-    void *rotate;
     char type;
     int config_id;
     int configuration[4][4];

@@ -1,7 +1,6 @@
 #include "../common.h"
 
-// TODO add check for bounds of falling_piece
-int process_state(SDL_Color dead_blocks[][10], struct Piece *falling_piece)
+int process_state(SDL_Color dead_blocks[][10])
 {
     int row_full = 1;
 
