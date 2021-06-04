@@ -7,9 +7,11 @@
 #include "../gameplay/process_state.h"
 #include "../gameplay/check_movement.h"
 #include "../gameplay/draw_dead_blocks.h"
+#include "../gameplay/rotate_piece.h"
 
 void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fall_needed, SDL_Color dead_blocks[][10], struct Piece *falling_piece)
 {
+    
     SDL_SetRenderDrawColor(app.renderer, 40, 40, 40, 255);
     SDL_RenderClear(app.renderer);
 
@@ -44,9 +46,8 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
 
     struct Scene_Position proposed_scene_position = {falling_piece->scene_position->x, falling_piece->scene_position->y};
     struct Scene_Position old_scene_position = {falling_piece->scene_position->x, falling_piece->scene_position->y};
-    // struct Piece proposed_falling_piece = { falling_piece->type, falling_piece->config_id, falling_piece->configuration, falling_piece->color, falling_piece->scene_position};
-    // struct Piece *proposed_falling_piece  = new (buf) struct Piece;
-    // memcpy(proposed_falling_piece, falling_piece, sizeof (falling_piece));
+    int old_config[4][4];
+    memcpy(old_config, falling_piece->configuration, sizeof (old_config));
 
     if (*next_action == 0)
     {
@@ -59,9 +60,12 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
     else if (*next_action == 2)
     {
         proposed_scene_position.y = proposed_scene_position.y + 1;
+    } else if (*next_action == 3) {
+        rotate_piece(falling_piece);
     }
-    // falling_piece->scene_position = &proposed_scene_position;
+    
     memcpy(falling_piece->scene_position, &proposed_scene_position, sizeof(&proposed_scene_position));
+    // memcpy(&proposed_falling_piece.scene_position, &proposed_scene_position, sizeof(proposed_scene_position));
 
     int points = process_state(dead_blocks);
     draw_dead_blocks(app, dead_blocks);
@@ -70,11 +74,14 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
         return;
     }
     int move_result = check_movement(dead_blocks, falling_piece);
+    // int move_result = check_movement(dead_blocks, &proposed_falling_piece);
 
     // draw_piece(app, falling_piece);
+    // draw_piece(app, &proposed_falling_piece);
     printf("move_result: %d\n", move_result);
     if (move_result == 1)
     {
+        // draw_piece(app, &proposed_falling_piece);
         draw_piece(app, falling_piece);
     }
     else
@@ -83,6 +90,7 @@ void draw_scene(struct App app, int *next_action, int *new_piece_needed, int *fa
         printf("!move_result\n");
         // falling_piece->scene_position = &old_scene_position;
         memcpy(falling_piece->scene_position, &old_scene_position, sizeof(&old_scene_position));
+        memcpy(falling_piece->configuration, old_config, sizeof(old_config));
         move_result = check_movement(dead_blocks, falling_piece);
         if (move_result == 1)
         {
