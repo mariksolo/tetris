@@ -35,12 +35,12 @@ int main()
     struct Scene_Position piece_scene_position = {0, 4};
 
     int config[4][4] = {{0, 0, 0, 0}, {0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}};
-    int dropped[7];
+    int dropped[7] = {0, 0, 0, 0, 0, 0, 0};
     struct Piece piece = {'s', 0, NULL, NULL, NULL};
     // memcpy(piece.configuration, config, sizeof(config));
     // piece.color = &color2;
     // piece.scene_position = &piece_scene_position;
-    
+
     // get_config(&piece, 'i', 0);
     piece.color = &color2;
     piece.scene_position = &piece_scene_position;
@@ -51,8 +51,8 @@ int main()
 
     while (1)
     {
-        
-        if (action_timer > 2)
+
+        if (action_timer > 1)
         {
             read_input(next_action);
         }
@@ -78,7 +78,7 @@ int main()
             // piece.type = 'q';
             // piece.config_id = 0;
             // memcpy(piece.configuration, config, sizeof(config));
-            
+
             *new_piece_needed = 0;
             // free(piece.color);
             // free(piece.scene_position);
@@ -93,8 +93,10 @@ int main()
         printf("y: %d\n", piece.scene_position->y);
         printf("x: %d\n", piece.scene_position->x);
         printf("type: %d\n", piece.type);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
                 printf("%d, ", piece.configuration[i][j]);
             }
             printf("\n");
